@@ -1,0 +1,15 @@
+##Pooling
+model {
+##Control arm
+logit_p0 ~ dnorm(0, 1/4)
+p0 <- 1/(exp(-logit_p0) + 1)
+event_control_all ~ dbin(p0, nsub_control_all)
+
+##Treatment arm
+logit_p1 ~ dnorm(0, 1/4)
+p1 <- 1/(exp(-logit_p1) + 1)
+event_treatment ~ dbin(p1, nsub_treatment)
+
+##Difference
+diff <- p1 - p0
+}

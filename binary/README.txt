@@ -1,0 +1,1 @@
+1. summary_results_binary: to derive the saved sample size of the MAP approach.

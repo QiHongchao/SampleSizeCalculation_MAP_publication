@@ -1,0 +1,18 @@
+##MAP approach
+model {
+for (j in 1:J) {
+  ##logit_p0 in the jth historical control arm
+  logit_p0_historical[j] ~ dnorm(logit_p0, 1/between_sd^2)
+  p0_historical[j] <- 1/(exp(-logit_p0_historical[j]) + 1)
+  event_historical[j] ~ dbin(p0_historical[j], nsub_historical[j])
+}
+
+##Overall mean of logit_p0, a large sd in log-odds scale is 2, the precision of a noninformative prior is 1/4
+logit_p0 ~ dnorm(0, 1/4)
+
+##Between-study heterogeneity
+between_sd ~ dnorm(0, prec_between_sd)T(0,)
+
+##New control proportion
+logit_p0_new ~ dnorm(logit_p0, 1/between_sd^2)
+}
