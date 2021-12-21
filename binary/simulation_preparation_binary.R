@@ -48,8 +48,8 @@ samplesize_num <- 11
 samplesize_candidate <- c(seq(20, 120, length.out = samplesize_num), 
                           seq(30, 280, length.out = samplesize_num),
                           seq(50, 750, length.out = samplesize_num),
-                          seq(1000, 3500, length.out = samplesize_num))
-interval <- c(10, 25, 70, 250)
+                          seq(500, 3500, length.out = samplesize_num))
+interval <- c(10, 25, 70, 300)
 hypothesis_testing <- matrix(NA, num_simulation, samplesize_num)
 
 ##Random seeds for JAGS
