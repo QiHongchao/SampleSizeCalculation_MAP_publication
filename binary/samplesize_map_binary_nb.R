@@ -67,6 +67,8 @@ Sys.time() - start
 
 ##Sample size for the treatment arm, calculate the exact sample size that achieves 80% power using linear interpolation
 for (i in 1:length(OR_candidate)) {
+  res <- read.csv(paste0("./results/hypothesis_testing_binary_nb_", i, ".csv"))
+  power_res$power[((i-1)*samplesize_num + 1):(i*samplesize_num)] <- apply(res, 2, mean)
   nb <- power_res[((i-1)*samplesize_num + 1):(i*samplesize_num),]
   samplesize_up_nb <- nb$samplesize[min(which(nb$power>=0.8))]
   power_low_nb <- nb$power[min(which(nb$power>=0.8))-1]
