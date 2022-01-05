@@ -53,7 +53,7 @@ for (j in 1:samplesize_num) {
     hypothesis_testing[i, j] <- (quantile(nb_sample$diff, 0.025) > 0 | quantile(nb_sample$diff, 0.975) < 0)
     
     ##Progress
-    if (i%%(num_simulation/2) == 0) {
+    if (i%%(num_simulation/10) == 0) {
       print(paste0("OR: ", OR, " sample size: ", samplesize, " simulation: ", i))
     }
   }

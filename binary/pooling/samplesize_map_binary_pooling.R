@@ -44,7 +44,7 @@ for (j in 1:samplesize_num) {
     update(pool_jags_model, n.iter = num_iter * perc_burnin, progress.bar = "none")
     
     ##Sampling after burnin
-    params <- c("p0_new", "p1", "diff")
+    params <- c("p0", "p1", "diff")
     
     pool_jags <- coda.samples(pool_jags_model, params, n.iter = num_iter * (1 - perc_burnin), 
                              progress.bar = "none")
@@ -54,7 +54,7 @@ for (j in 1:samplesize_num) {
     hypothesis_testing[i, j] <- (quantile(pool_sample$diff, 0.025) > 0 | quantile(pool_sample$diff, 0.975) < 0)
     
     ##Progress
-    if (i%%(num_simulation/2) == 0) {
+    if (i%%(num_simulation/10) == 0) {
       print(paste0("OR: ", OR, " sample size: ", samplesize, " simulation: ", i))
     }
   }
