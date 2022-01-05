@@ -13,7 +13,7 @@ if (Sys.getenv("USERNAME") == "043712") {
 source("simulation_preparation_binary.R")
 
 ##The purpose of the unbalanced trial is to make sure that the sample size in the treatment arm is not reduced
-power_res_nb <- read.csv("./results/power_res_binary_nb.csv")
+power_res_nb <- read.csv("./pooling/power_res_binary_nb.csv")
 samplesize_treatment_candidate <- NULL
 ##Sample size for the treatment arm
 for (i in 1:length(OR_candidate)) {
@@ -39,8 +39,8 @@ for (j in 1:samplesize_num) {
   ##step 2 - step 5: sample a new trial data set; analyze it using the pooling approach; hypothesis testing; do the above N times
   for (i in 1:num_simulation) {
     set.seed(seeds_simulation[i, j])
-    ##sample p0_new from the MAP prior
-    p0_new_sim <- sample(map_sample$p0_new, 1)
+    ##sample p0_new from the pool sample
+    p0_new_sim <- sample(pool_sample$p0, 1)
     p1_new_sim <- OR*p0_new_sim/(1+(OR-1)*p0_new_sim)
     event_control <- rbinom(1, samplesize_control, p0_new_sim)
     event_treatment <- rbinom(1, samplesize_treatment, p1_new_sim)
@@ -80,6 +80,6 @@ for (j in 1:samplesize_num) {
   power_res$power[(k-1)*samplesize_num+j] <- mean(hypothesis_testing[,j])
 }
   ##Hypothesis testing for different candidate sample sizes
-  write.csv(hypothesis_testing, paste0("./results/hypothesis_testing_binary_pool_unbalanced_", k, ".csv"), row.names = F)
+  write.csv(hypothesis_testing, paste0("./pooling/hypothesis_testing_binary_pool_unbalanced_", k, ".csv"), row.names = F)
 }
 Sys.time() - start

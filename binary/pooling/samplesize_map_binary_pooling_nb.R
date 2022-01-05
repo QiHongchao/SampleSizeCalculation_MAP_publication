@@ -8,6 +8,7 @@ if (Sys.getenv("USERNAME") == "043712") {
   setwd("C:\\EMC\\Research\\PhD projects\\Repo_publications\\SampleSizeCalculation_MAP_publication\\binary")
 }
 
+
 ##Simulation preparation, step 1 conducted in the file
 source("simulation_preparation_binary.R")
 
@@ -18,40 +19,38 @@ for (j in 1:samplesize_num) {
   ##choose sample size per arm
   samplesize <- samplesize_candidate[(k-1)*samplesize_num+j]
   
-  ##step 2 - step 5: sample a new trial data set; analyze it using the pooling approach; hypothesis testing; do the above N times
+  ##step 2 - step 5: sample a new trial data set; analyze it using the NB approach; hypothesis testing; do the above N times
   for (i in 1:num_simulation) {
     set.seed(seeds_simulation[i, j])
-    ##sample p0_new from the pool sample
     p0_new_sim <- sample(pool_sample$p0, 1)
     p1_new_sim <- OR*p0_new_sim/(1+(OR-1)*p0_new_sim)
     event_control <- rbinom(1, samplesize, p0_new_sim)
     event_treatment <- rbinom(1, samplesize, p1_new_sim)
     
-    ##Pooling analysis, pool the historical controls and the current control
-    jags_data_pool <- list(nsub_control_all = sum(nsub_historical)+samplesize, 
-                           event_control_all = sum(event_historical)+event_control, 
-                           nsub_treatment = samplesize,
-                           event_treatment = event_treatment)
+    ##No borrowing analysis
+    jags_data_nb <- list(nsub_control_new = samplesize, nsub_treatment_new = samplesize,
+                          event_control_new = event_control, event_treatment_new = event_treatment)
     
-    pool_jags_model <- jags.model(file = "./jags/pool_binary.txt", data = jags_data_pool, 
+    nb_jags_model <- jags.model(file = "./jags/nb_binary.txt", data = jags_data_nb,
                                  n.chains = num_chains, n.adapt = 1000, quiet = T,
                                  inits = list(list(.RNG.name = "base::Wichmann-Hill", .RNG.seed = seeds_jags_simulation[(i-1)*num_chains+1, j]),
                                               list(.RNG.name = "base::Wichmann-Hill", .RNG.seed = seeds_jags_simulation[(i-1)*num_chains+2, j]),
                                               list(.RNG.name = "base::Wichmann-Hill", .RNG.seed = seeds_jags_simulation[(i-1)*num_chains+3, j]),
                                               list(.RNG.name = "base::Wichmann-Hill", .RNG.seed = seeds_jags_simulation[i*num_chains, j])))
-    
+
     ##Burnin stage
-    update(pool_jags_model, n.iter = num_iter * perc_burnin, progress.bar = "none")
-    
+    update(nb_jags_model, n.iter = num_iter * perc_burnin, progress.bar = "none")
+
     ##Sampling after burnin
-    params <- c("p0_new", "p1", "diff")
-    
-    pool_jags <- coda.samples(pool_jags_model, params, n.iter = num_iter * (1 - perc_burnin), 
+    params <- c("p0", "p1", "diff")
+
+    nb_jags <- coda.samples(nb_jags_model, params, n.iter = num_iter * (1 - perc_burnin),
                              progress.bar = "none")
+
+    nb_sample <- as.data.frame(do.call(rbind, nb_jags))
     
-    pool_sample <- as.data.frame(do.call(rbind, pool_jags))
-    
-    hypothesis_testing[i, j] <- (quantile(pool_sample$diff, 0.025) > 0 | quantile(pool_sample$diff, 0.975) < 0)
+    ##Hypothesis testing
+    hypothesis_testing[i, j] <- (quantile(nb_sample$diff, 0.025) > 0 | quantile(nb_sample$diff, 0.975) < 0)
     
     ##Progress
     if (i%%(num_simulation/2) == 0) {
@@ -62,6 +61,20 @@ for (j in 1:samplesize_num) {
   power_res$power[(k-1)*samplesize_num+j] <- mean(hypothesis_testing[,j])
 }
   ##Hypothesis testing for different candidate sample sizes
-  write.csv(hypothesis_testing, paste0("./pooling/hypothesis_testing_binary_pool_", k, ".csv"), row.names = F)
+  write.csv(hypothesis_testing, paste0("./pooling/hypothesis_testing_binary_nb_", k, ".csv"), row.names = F)
 }
 Sys.time() - start
+
+##Sample size for the treatment arm, calculate the exact sample size that achieves 80% power using linear interpolation
+for (i in 1:length(OR_candidate)) {
+  res <- read.csv(paste0("./pooling/hypothesis_testing_binary_nb_", i, ".csv"))
+  power_res$power[((i-1)*samplesize_num + 1):(i*samplesize_num)] <- apply(res, 2, mean)
+  nb <- power_res[((i-1)*samplesize_num + 1):(i*samplesize_num),]
+  samplesize_up_nb <- nb$samplesize[min(which(nb$power>=0.8))]
+  power_low_nb <- nb$power[min(which(nb$power>=0.8))-1]
+  power_up_nb <- nb$power[min(which(nb$power>=0.8))]
+  samplesize_nb <- (0.8 - (power_up_nb - (power_up_nb - power_low_nb)/interval[i]*samplesize_up_nb))*interval[i]/(power_up_nb - power_low_nb)
+  print(paste0("trteff: ", OR_candidate[i], " sampleszie for the treatment arm: ", ceiling(samplesize_nb)))
+}
+write.csv(power_res, "./pooling/power_res_binary_nb.csv", row.names = F)
+
