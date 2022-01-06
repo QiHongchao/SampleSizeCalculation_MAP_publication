@@ -26,9 +26,9 @@ pool_ub <- data.frame(num_simulation = rep(num_simulation, samplesize_num*length
                      samplesize = samplesize_candidate, OR = rep(OR_candidate, each = samplesize_num),
                      power = NA, Approach = "Pool+unbalanced")
 for (i in 1:length(OR_candidate)) {
-  nb$power[((i-1)*samplesize_num + 1):(i*samplesize_num)] <- apply(read.csv(paste0("./results/hypothesis_testing_binary_nb_", i, ".csv")), 2, mean)
-  pool$power[((i-1)*samplesize_num + 1):(i*samplesize_num)] <- apply(read.csv(paste0("./results/hypothesis_testing_binary_pool_", i, ".csv")), 2, mean)
-  pool_ub$power[((i-1)*samplesize_num + 1):(i*samplesize_num)] <- apply(read.csv(paste0("./results/hypothesis_testing_binary_pool_unbalanced_", i, ".csv")), 2, mean) 
+  nb$power[((i-1)*samplesize_num + 1):(i*samplesize_num)] <- apply(read.csv(paste0("./pooling/hypothesis_testing_binary_nb_", i, ".csv")), 2, mean)
+  pool$power[((i-1)*samplesize_num + 1):(i*samplesize_num)] <- apply(read.csv(paste0("./pooling/hypothesis_testing_binary_pool_", i, ".csv")), 2, mean)
+  pool_ub$power[((i-1)*samplesize_num + 1):(i*samplesize_num)] <- apply(read.csv(paste0("./pooling/hypothesis_testing_binary_pool_unbalanced_", i, ".csv")), 2, mean) 
 }
 
 res_binary <- rbind(nb, pool, pool_ub)
@@ -48,7 +48,7 @@ ggarrange(powercurves[[1]], powercurves[[2]], powercurves[[3]], powercurves[[4]]
 
 ##Saved sample size
 savedsamplesize <- data.frame(OR = OR_candidate, nb = NA, pool = NA, poolub = NA, savedpool = NA, savedpoolub = NA)
-for (i in 1:length(OR_candidate)) {
+for (i in 2:length(OR_candidate)) {
   nb_OR <- nb[((i-1)*samplesize_num + 1):(i*samplesize_num),]
   pool_OR <- pool[((i-1)*samplesize_num + 1):(i*samplesize_num),]
   pool_ub_OR <- pool_ub[((i-1)*samplesize_num + 1):(i*samplesize_num),]

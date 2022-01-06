@@ -10,7 +10,7 @@ if (Sys.getenv("USERNAME") == "043712") {
 
 
 ##Simulation preparation, step 1 conducted in the file
-source("simulation_preparation_binary.R")
+source("pooling/simulation_preparation_binary_pool.R")
 
 start <- Sys.time()
 for (k in 1:length(OR_candidate)) {
