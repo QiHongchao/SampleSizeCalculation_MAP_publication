@@ -9,7 +9,7 @@ if (Sys.getenv("USERNAME") == "043712") {
 }
 
 ##Data preparation
-source("simulation_preparation_binary.R")
+source("pooling/simulation_preparation_binary_pool.R")
 
 ##Package
 library(ggplot2)
@@ -43,12 +43,12 @@ for (i in 1:length(OR_candidate)) {
     scale_y_continuous(breaks=seq(floor(min(res_binary$power)*100), ceiling(max(res_binary$power)*100), 4)) + 
     theme_classic() + theme(legend.position="none", plot.title = element_text(hjust = 0.5)) + ggtitle(paste0("OR = ", OR_candidate[i]))
 }
-ggarrange(powercurves[[1]], powercurves[[2]], powercurves[[3]], powercurves[[4]],
+ggarrange(powercurves[[1]], powercurves[[2]], powercurves[[3]],
           ncol=2, nrow=2, common.legend = TRUE, legend="bottom")
 
 ##Saved sample size
 savedsamplesize <- data.frame(OR = OR_candidate, nb = NA, pool = NA, poolub = NA, savedpool = NA, savedpoolub = NA)
-for (i in 2:length(OR_candidate)) {
+for (i in 1:length(OR_candidate)) {
   nb_OR <- nb[((i-1)*samplesize_num + 1):(i*samplesize_num),]
   pool_OR <- pool[((i-1)*samplesize_num + 1):(i*samplesize_num),]
   pool_ub_OR <- pool_ub[((i-1)*samplesize_num + 1):(i*samplesize_num),]
