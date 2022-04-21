@@ -11,10 +11,6 @@ if (Sys.getenv("USERNAME") == "043712") {
 ##Data preparation
 source("simulation_preparation_binary.R")
 
-##Package
-library(ggplot2)
-library(ggpubr)
-
 ##Combine the results
 nb <- data.frame(num_simulation = rep(num_simulation, samplesize_num*length(OR_candidate)),
                  samplesize = samplesize_candidate, OR = rep(OR_candidate, each = samplesize_num),
@@ -43,7 +39,7 @@ for (i in 1:length(OR_candidate)) {
     scale_y_continuous(breaks=seq(floor(min(res_binary$power)*100), ceiling(max(res_binary$power)*100), 4)) + 
     theme_classic() + theme(legend.position="none", plot.title = element_text(hjust = 0.5)) + ggtitle(paste0("OR = ", OR_candidate[i]))
 }
-ggarrange(powercurves[[1]], powercurves[[2]], powercurves[[3]], powercurves[[4]],
+ggarrange(powercurves[[1]], powercurves[[2]], powercurves[[3]],
           ncol=2, nrow=2, common.legend = TRUE, legend="bottom")
 
 ##Saved sample size
@@ -68,13 +64,11 @@ for (i in 1:length(OR_candidate)) {
   power_up_map_ub <- map_ub_OR$power[min(which(map_ub_OR$power>=0.8))]
   samplesize_map_ub <- (0.8 - (power_up_map_ub - (power_up_map_ub - power_low_map_ub)/interval[i]*samplesize_up_map_ub))*interval[i]/(power_up_map_ub - power_low_map_ub)
   
-  ##Saved sample size
-  print(paste("OR:", OR_candidate[i], "saved sample size, balanced:", round(2*(samplesize_map - samplesize_nb), 2),
-              "saved sample size, unbalanced:", round(samplesize_map_ub - samplesize_nb, 2)))
-  savedsamplesize$nb[i] <- round(samplesize_nb, 2)
-  savedsamplesize$map[i] <- round(samplesize_map, 2)
-  savedsamplesize$mapub[i] <- round(samplesize_map_ub, 2)
-  savedsamplesize$savedmap[i] <- round(2*(samplesize_map - samplesize_nb), 2)
-  savedsamplesize$savedmapub[i] <- round(samplesize_map_ub - samplesize_nb, 2)
+  ##Required sample sizes and saved sample sizes
+  savedsamplesize$nb[i] <- 2*ceiling(samplesize_nb)
+  savedsamplesize$map[i] <- 2*ceiling(samplesize_map)
+  savedsamplesize$mapub[i] <- ceiling(samplesize_map_ub) + ceiling(samplesize_nb)
+  savedsamplesize$savedmap[i] <- savedsamplesize$nb[i] - savedsamplesize$map[i]
+  savedsamplesize$savedmapub[i] <- savedsamplesize$nb[i] - savedsamplesize$mapub[i]
 }
 savedsamplesize

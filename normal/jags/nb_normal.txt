@@ -1,0 +1,8 @@
+model {
+##current trial
+mean_control ~ dnorm(theta_new, tau_new)
+mean_treatment ~ dnorm(theta1_new, tau1_new)
+theta_new ~ dnorm(0, 1e-6)
+theta1_new ~ dnorm(0, 1e-6)
+trteff <- theta1_new - theta_new
+}

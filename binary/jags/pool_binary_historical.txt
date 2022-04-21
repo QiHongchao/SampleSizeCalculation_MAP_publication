@@ -1,6 +1,0 @@
-model {
-  p0 <- 1/(exp(-logit_p0) + 1)
-  event ~ dbin(p0, nsub)
-  ##Overall mean of logit_p0, a large sd in log-odds scale is 2, the precision of a noninformative prior is 1/4
-  logit_p0 ~ dnorm(0, 1/4)
-}

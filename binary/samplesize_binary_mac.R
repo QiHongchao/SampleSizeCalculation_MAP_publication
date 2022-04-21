@@ -1,24 +1,16 @@
 rm(list=ls())
 
-##Set working directory
-if (Sys.getenv("USERNAME") == "043712") {
-  setwd("V:\\Users\\043712(H. Qi)\\Documents\\PhD projects\\Repo_publications\\SampleSizeCalculation_MAP_publication\\binary")
-  .libPaths("V:\\Users\\043712(H. Qi)\\Documents\\Rlib")
-} else {
-  setwd("C:\\EMC\\Research\\PhD projects\\Repo_publications\\SampleSizeCalculation_MAP_publication\\binary")
-}
-
-##Simulation preparation, step 1 conducted in the file
+##Simulation preparation
 source("simulation_preparation_binary.R")
 
 start <- Sys.time()
 for (k in 1:length(OR_candidate)) {
   OR <- OR_candidate[k]
 for (j in 1:samplesize_num) {
-  ##choose sample size per arm
+  ##Specify sample size per arm
   samplesize <- samplesize_candidate[(k-1)*samplesize_num+j]
   
-  ##step 2 - step 5: sample a new trial data set; analyze it using the MAC approach; hypothesis testing; do the above N times
+  ##Simulate a new trial data set; analyze it using the MAP approach; hypothesis testing; do the above many times
   for (i in 1:num_simulation) {
     set.seed(seeds_simulation[i, j])
     p0_new_sim <- sample(map_sample$p0_new, 1)
@@ -44,20 +36,19 @@ for (j in 1:samplesize_num) {
     
     ##Sampling after burnin
     params <- c("p0_new", "p1", "diff")
-    
     mac_jags <- coda.samples(mac_jags_model, params, n.iter = num_iter * (1 - perc_burnin), 
                              progress.bar = "none")
-    
     mac_sample <- as.data.frame(do.call(rbind, mac_jags))
     
+    ##Hypothesis testing
     hypothesis_testing[i, j] <- (quantile(mac_sample$diff, 0.025) > 0 | quantile(mac_sample$diff, 0.975) < 0)
     
-    ##Progress
-    if (i%%(num_simulation/2) == 0) {
+    ##Progress monitoring
+    if (i%%(num_simulation/10) == 0) {
       print(paste0("OR: ", OR, " sample size: ", samplesize, " simulation: ", i))
     }
   }
-  ##step 6: calculate the power based on the chosen sample size
+  ##step 6: calculate the power based on the specified sample size
   power_res$power[(k-1)*samplesize_num+j] <- mean(hypothesis_testing[,j])
 }
   ##Hypothesis testing for different candidate sample sizes

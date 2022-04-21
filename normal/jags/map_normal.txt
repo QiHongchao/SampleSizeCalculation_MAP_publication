@@ -1,0 +1,11 @@
+model {
+for (i in 1:J) {
+  estimate[i] ~ dnorm(theta[i], 1/se[i]^2)
+  theta[i] ~ dnorm(mu, 1/sigma^2)
+}
+mu ~ dnorm(0, 1e-6)
+sd_sigma <- sd/2
+sigma ~ dnorm(0, 1/sd_sigma^2) T(0,)
+##predictive
+theta_new ~ dnorm(mu, 1/sigma^2)
+}
