@@ -1,13 +1,5 @@
 rm(list = ls())
 
-##Set working directory
-if (Sys.getenv("USERNAME") == "043712") {
-  setwd("V:\\Users\\043712(H. Qi)\\Documents\\PhD projects\\Repo_publications\\SampleSizeCalculation_MAP_publication\\binary")
-  .libPaths("V:\\Users\\043712(H. Qi)\\Documents\\Rlib")
-} else {
-  setwd("C:\\EMC\\Research\\PhD projects\\Repo_publications\\SampleSizeCalculation_MAP_publication\\binary")
-}
-
 ##Data preparation
 source("simulation_preparation_binary.R")
 

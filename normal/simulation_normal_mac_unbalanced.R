@@ -4,7 +4,6 @@ rm(list=ls())
 ##Simulation preparation
 source("simulation_preparation_normal.R")
 
-
 ##The purpose of the unbalanced trial is to make sure that the sample size in the treatment arm is not reduced
 power_res_nb <- read.csv("./results/power_res_nb.csv")
 samplesize_treatment_candidate <- NULL
