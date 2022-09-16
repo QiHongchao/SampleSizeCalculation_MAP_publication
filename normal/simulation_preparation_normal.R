@@ -57,7 +57,8 @@ hist(bma_random$map_sample$mu, breaks = 50)
 hist(bma_random$map_sample$theta_new, breaks = 50)
 
 ##ESS calculation
-normal_mix <- mixfit(bma_random$map_sample$theta_new, type = "norm", Nc = 1)
+set.seed(12345)
+normal_mix <- automixfit(bma_random$map_sample$theta_new, type = "norm")
 RBesT::ess(normal_mix, method = "moment", sigma = sd_current)
 RBesT::ess(normal_mix, method = "morita", sigma = sd_current)
 RBesT::ess(normal_mix, method = "elir", sigma = sd_current)

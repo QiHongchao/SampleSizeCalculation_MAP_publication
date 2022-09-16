@@ -1,7 +1,7 @@
 rm(list=ls())
 
 ##Simulation preparation
-source("simulation_preparation.R")
+source("simulation_preparation_normal.R")
 
 start <- Sys.time()
 for (k in 1:length(trteff_candidate)) {

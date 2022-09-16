@@ -45,6 +45,13 @@ map_sample <- as.data.frame(do.call(rbind, map_jags))
 ##The prior for p0_new
 map_sample$p0_new <- 1/(1 + exp(-map_sample$logit_p0_new))
 
+##ESS by RBesT
+set.seed(12345)
+beta_mix <- automixfit(map_sample$p0_new, type = "beta")
+RBesT::ess(beta_mix, method = "moment")
+RBesT::ess(beta_mix, method = "morita")
+RBesT::ess(beta_mix, method = "elir")
+
 ##Propose a list of candidate sample sizes
 samplesize_num <- 6
 samplesize_candidate <- c(seq(20, 120, length.out = samplesize_num), 
@@ -63,9 +70,3 @@ seeds_jags_simulation <- matrix(sample(.Machine$integer.max, num_simulation*num_
 power_res <- data.frame(num_simulation = num_simulation, samplesize = samplesize_candidate, 
                         OR = rep(OR_candidate, each = samplesize_num), 
                         power = NA)
-
-##ESS by RBesT
-beta_mix <- mixfit(map_sample$p0_new, type = "beta", Nc = 2)
-RBesT::ess(beta_mix, method = "moment")
-RBesT::ess(beta_mix, method = "morita")
-RBesT::ess(beta_mix, method = "elir")
