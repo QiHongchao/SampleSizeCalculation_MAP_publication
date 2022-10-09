@@ -28,7 +28,8 @@ for (i in 1:length(trteff_candidate)) {
     geom_point() + geom_line() + geom_hline(yintercept=80, linetype="dashed", color="red") +
     labs(x = "Sample size", y = "Power (%)") + labs(tag = paste0("(", LETTERS[i], ")")) +
     scale_x_continuous(breaks=res_normal$samplesize[res_normal$trteff==trteff_candidate[i]]) +
-    scale_y_continuous(breaks=seq(floor(min(res_normal$power)*100), ceiling(max(res_normal$power)*100), 8)) + 
+    scale_y_continuous(breaks=seq(0, 100, 10)) + 
+    expand_limits(y=c(0, 100)) + 
     theme_classic() + theme(legend.position="none", plot.title = element_text(hjust = 0.5)) + 
     ggtitle(paste0("Treatment effect = ", trteff_candidate[i]))
 }

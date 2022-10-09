@@ -28,7 +28,8 @@ for (i in 1:length(OR_candidate)) {
     geom_point() + geom_line() + geom_hline(yintercept=80, linetype="dashed", color="red") +
     labs(x = "Sample size", y = "Power (%)") + labs(tag = paste0("(", LETTERS[i], ")")) +
     scale_x_continuous(breaks=res_binary$samplesize[res_binary$OR==OR_candidate[i]]) +
-    scale_y_continuous(breaks=seq(floor(min(res_binary$power)*100), ceiling(max(res_binary$power)*100), 4)) + 
+    scale_y_continuous(breaks=seq(0, 100, 10)) + 
+    expand_limits(y=c(0, 100)) + 
     theme_classic() + theme(legend.position="none", plot.title = element_text(hjust = 0.5)) + ggtitle(paste0("OR = ", OR_candidate[i]))
 }
 ggarrange(powercurves[[1]], powercurves[[2]], powercurves[[3]],
